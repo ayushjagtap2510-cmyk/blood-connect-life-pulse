@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blood Bank Admin Panel</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Emergency Alert Banner -->
+  <div id="emergencyBanner" class="emergency-banner hidden" data-active="false">
+    <div class="banner-inner">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span id="bannerText">⚠️ EMERGENCY DETECTED — Immediate action required in the blood supply network!</span>
+      <button onclick="dismissBanner()" class="banner-close"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-tint"></i></div>
+        <span class="logo-text">BloodBank<br><small>Emergency System</small></span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item" data-section="dashboard" onclick="showSection('dashboard')">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </li>
+          <li class="nav-item" data-section="global-news" onclick="showSection('global-news')">
+            <i class="fas fa-globe"></i>
+            <span>Check Global News</span>
+          </li>
+          <li class="nav-item active" data-section="upload-news" onclick="showSection('upload-news')">
+            <i class="fas fa-upload"></i>
+            <span>Upload News Article</span>
+            <span class="nav-badge">Active</span>
+          </li>
+          <li class="nav-item" data-section="alerts" onclick="showSection('alerts')">
+            <i class="fas fa-bell"></i>
+            <span>Emergency Alerts</span>
+            <span class="nav-dot"></span>
+          </li>
+          <li class="nav-item" data-section="blood-requests" onclick="showSection('blood-requests')">
+            <i class="fas fa-procedures"></i>
+            <span>Blood Requests</span>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="logout-btn" onclick="handleLogout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+
+      <!-- Top Navbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 class="topbar-title"><span>Blood Bank</span> Admin Panel</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="notif-btn" onclick="toggleNotifDropdown()" id="notifBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notif-count" id="notifCount">3</span>
+            <div class="notif-dropdown" id="notifDropdown">
+              <div class="notif-header">Notifications</div>
+              <div class="notif-item urgent">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                  <p>Critical blood shortage — O− type</p>
+                  <small>2 minutes ago</small>
+                </div>
+              </div>
+              <div class="notif-item">
+                <i class="fas fa-file-alt"></i>
+                <div>
+                  <p>New article analyzed successfully</p>
+                  <small>15 minutes ago</small>
+                </div>
+              </div>
+              <div class="notif-item">
+                <i class="fas fa-user-plus"></i>
+                <div>
+                  <p>New blood request from City Hospital</p>
+                  <small>1 hour ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-profile">
+            <div class="admin-avatar">AD</div>
+            <div class="admin-info">
+              <span class="admin-name">Dr. Admin</span>
+              <small>Super Admin</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="main-content">
+
+        <!-- =========== DASHBOARD SECTION =========== -->
+        <section id="section-dashboard" class="page-section active">
+          <div class="section-header">
+            <h2>Dashboard Overview</h2>
+            <p>Real-time blood bank emergency monitoring system</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card red">
+              <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+              <div class="stat-info">
+                <h3>4</h3>
+                <p>Active Emergencies</p>
+              </div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-icon"><i class="fas fa-tint"></i></div>
+              <div class="stat-info">
+                <h3>128</h3>
+                <p>Blood Units Available</p>
+              </div>
+            </div>
+            <div class="stat-card blue">
+              <div class="stat-icon"><i class="fas fa-file-medical-alt"></i></div>
+              <div class="stat-info">
+                <h3>37</h3>
+                <p>Articles Analyzed</p>
+              </div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+              <div class="stat-info">
+                <h3>22</h3>
+                <p>Requests Fulfilled</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-lower">
+            <div class="card recent-alerts">
+              <div class="card-header">
+                <h3><i class="fas fa-bell"></i> Recent Emergency Alerts</h3>
+              </div>
+              <div class="alert-list">
+                <div class="alert-row high">
+                  <span class="severity-dot high"></span>
+                  <div class="alert-info">
+                    <strong>Dengue Outbreak — O+ shortage</strong>
+                    <small>City General Hospital · 10 min ago</small>
+                  </div>
+                  <span class="severity-tag high">HIGH</span>
+                </div>
+                <div class="alert-row medium">
+                  <span class="severity-dot medium"></span>
+                  <div class="alert-info">
+                    <strong>Mass accident reported on Highway 44</strong>
+                    <small>District News Feed · 1 hr ago</small>
+                  </div>
+                  <span class="severity-tag medium">MEDIUM</span>
+                </div>
+                <div class="alert-row low">
+                  <span class="severity-dot low"></span>
+                  <div class="alert-info">
+                    <strong>Blood camp cancelled due to weather</strong>
+                    <small>Local Notice Board · 3 hr ago</small>
+                  </div>
+                  <span class="severity-tag low">LOW</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card blood-stock">
+              <div class="card-header">
+                <h3><i class="fas fa-tint"></i> Blood Stock Status</h3>
+              </div>
+              <div class="blood-grid">
+                <div class="blood-type critical"><div class="bt-label">A+</div><div class="bt-units">12</div><div class="bt-status">Critical</div></div>
+                <div class="blood-type ok"><div class="bt-label">A−</div><div class="bt-units">34</div><div class="bt-status">OK</div></div>
+                <div class="blood-type critical"><div class="bt-label">B+</div><div class="bt-units">7</div><div class="bt-status">Critical</div></div>
+                <div class="blood-type ok"><div class="bt-label">B−</div><div class="bt-units">20</div><div class="bt-status">OK</div></div>
+                <div class="blood-type low"><div class="bt-label">AB+</div><div class="bt-units">15</div><div class="bt-status">Low</div></div>
+                <div class="blood-type ok"><div class="bt-label">AB−</div><div class="bt-units">28</div><div class="bt-status">OK</div></div>
+                <div class="blood-type critical"><div class="bt-label">O+</div><div class="bt-units">4</div><div class="bt-status">Critical</div></div>
+                <div class="blood-type ok"><div class="bt-label">O−</div><div class="bt-units">8</div><div class="bt-status">Low</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========== UPLOAD NEWS SECTION =========== -->
+        <section id="section-upload-news" class="page-section">
+          <div class="section-header">
+            <h2><i class="fas fa-upload"></i> Upload News Article</h2>
+            <p>Analyze news articles for blood emergency signals using AI detection</p>
+          </div>
+
+          <div class="upload-grid">
+            <!-- Upload Card -->
+            <div class="card upload-card">
+              <div class="card-header">
+                <h3><i class="fas fa-file-upload"></i> Article Upload</h3>
+              </div>
+
+              <div class="drop-zone" id="dropZone"
+                   ondragover="handleDragOver(event)"
+                   ondragleave="handleDragLeave(event)"
+                   ondrop="handleDrop(event)"
+                   onclick="triggerFileInput()">
+                <div class="drop-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <p class="drop-title">Drag & Drop your article here</p>
+                <p class="drop-sub">or <span class="drop-link">browse to upload</span></p>
+                <p class="drop-types">Supported: .txt &nbsp;·&nbsp; .pdf &nbsp;·&nbsp; .docx</p>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="file" name="file" id="fileInput" accept=".txt,.pdf,.docx" onchange="handleFileSelect(event)" hidden />
+                </form>
+              </div>
+
+              <div class="file-info hidden" id="fileInfo">
+                <i class="fas fa-file-alt"></i>
+                <span id="fileName">No file selected</span>
+                <button class="remove-file" onclick="removeFile()"><i class="fas fa-times"></i></button>
+              </div>
+
+              <div class="upload-actions">
+                <button class="btn-analyze" id="analyzeBtn" onclick="analyzeArticle()" disabled>
+                  <i class="fas fa-search-plus"></i> Analyze Article
+                </button>
+              </div>
+
+              <!-- Loading State -->
+              <div class="loading-state hidden" id="loadingState">
+                <div class="spinner-wrap">
+                  <div class="spinner"></div>
+                  <div class="spinner-ring"></div>
+                </div>
+                <p class="loading-text">Analyzing article for emergency signals...</p>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p class="progress-label" id="progressLabel">0%</p>
+              </div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card results-card" id="resultsCard">
+              <div class="card-header">
+                <h3><i class="fas fa-chart-bar"></i> Analysis Results</h3>
+              </div>
+              <div class="results-placeholder" id="resultsPlaceholder">
+                <i class="fas fa-file-search"></i>
+                <p>Upload and analyze an article to see results here</p>
+              </div>
+              <div class="results-content hidden" id="resultsContent">
+                <!-- Emergency Status -->
+                <div class="result-status" id="resultStatus">
+                  <div class="status-icon-wrap" id="statusIconWrap">
+                    <i class="fas fa-exclamation-triangle" id="statusIcon"></i>
+                  </div>
+                  <div>
+                    <h4 id="statusTitle">Emergency Detected</h4>
+                    <p id="statusSubtitle">Immediate action recommended</p>
+                  </div>
+                </div>
+
+                <!-- Severity Level -->
+                <div class="result-row">
+                  <label>Severity Level</label>
+                  <input type="hidden" id="severityValue">
+                  <div class="severity-display" id="severityDisplay">
+                    <span class="severity-bar-wrap">
+                      <span class="severity-bar" id="severityBar"></span>
+                    </span>
+                    <span class="severity-label" id="severityLabel">HIGH</span>
+                  </div>
+                </div>
+
+                <!-- Keywords -->
+                <div class="result-row">
+                  <label>Matched Keywords</label>
+                  <div class="keyword-badges" id="keywordBadges"></div>
+                </div>
+
+                <!-- Article Preview -->
+                <div class="result-row">
+                  <label>Article Preview</label>
+                  <div class="article-preview" id="articlePreview"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="result-actions">
+                  <button class="btn-alert" onclick="triggerAlert()"><i class="fas fa-bell"></i> Send Alert</button>
+                  <button class="btn-reset" onclick="resetAnalysis()"><i class="fas fa-redo"></i> Analyze Another</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========== GLOBAL NEWS SECTION =========== -->
+        <section id="section-global-news" class="page-section">
+          <div class="section-header">
+            <h2><i class="fas fa-globe"></i> Global News Monitor</h2>
+            <p>Fetch and monitor live news articles related to blood emergencies worldwide</p>
+          </div>
+
+          <div class="card">
+            <div class="news-toolbar">
+              <div class="news-filters">
+                <button class="filter-btn active" onclick="setFilter(this, 'all')">All</button>
+                <button class="filter-btn" onclick="setFilter(this, 'emergency')">Emergency</button>
+                <button class="filter-btn" onclick="setFilter(this, 'donation')">Donation</button>
+                <button class="filter-btn" onclick="setFilter(this, 'shortage')">Shortage</button>
+              </div>
+              <button class="btn-live-news" id="liveNewsBtn" onclick="fetchLiveNews()">
+                <i class="fas fa-satellite-dish"></i> Check Live News
+              </button>
+            </div>
+
+            <div class="news-loading hidden" id="newsLoading">
+              <div class="news-spinner"></div>
+              <span>Fetching latest news...</span>
+            </div>
+
+            <div class="news-list" id="newsList"></div>
+              <!-- Populated by JS -->
+              <div class="news-empty">
+                <i class="fas fa-newspaper"></i>
+                <p>Click "Check Live News" to fetch the latest articles</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========== ALERTS SECTION =========== -->
+        <section id="section-alerts" class="page-section">
+          <div class="section-header">
+            <h2><i class="fas fa-bell"></i> Emergency Alerts</h2>
+            <p>All active and resolved emergency alerts</p>
+          </div>
+          <div class="card">
+            <table class="alerts-table">
+              <thead>
+                <tr>
+                  <th>Alert ID</th>
+                  <th>Description</th>
+                  <th>Source</th>
+                  <th>Time</th>
+                  <th>Severity</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="alertsTableBody">
+                <tr>
+                  <td>#ALT-0041</td>
+                  <td>Dengue surge — O+ critically low</td>
+                  <td>City General</td>
+                  <td>10 min ago</td>
+                  <td><span class="severity-tag high">HIGH</span></td>
+                  <td><span class="status-active">Active</span></td>
+                </tr>
+                <tr>
+                  <td>#ALT-0040</td>
+                  <td>Mass accident — multiple blood types needed</td>
+                  <td>Highway 44 Report</td>
+                  <td>1 hr ago</td>
+                  <td><span class="severity-tag medium">MEDIUM</span></td>
+                  <td><span class="status-active">Active</span></td>
+                </tr>
+                <tr>
+                  <td>#ALT-0039</td>
+                  <td>Flood victims in relief camp</td>
+                  <td>Relief Authority</td>
+                  <td>3 hr ago</td>
+                  <td><span class="severity-tag high">HIGH</span></td>
+                  <td><span class="status-resolved">Resolved</span></td>
+                </tr>
+                <tr>
+                  <td>#ALT-0038</td>
+                  <td>Blood camp cancelled</td>
+                  <td>Local Board</td>
+                  <td>5 hr ago</td>
+                  <td><span class="severity-tag low">LOW</span></td>
+                  <td><span class="status-resolved">Resolved</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- =========== BLOOD REQUESTS SECTION =========== -->
+        <section id="section-blood-requests" class="page-section">
+          <div class="section-header">
+            <h2><i class="fas fa-procedures"></i> Blood Requests</h2>
+            <p>Manage incoming and outgoing blood request orders</p>
+          </div>
+          <div class="requests-grid">
+            <div class="request-card urgent">
+              <div class="req-header">
+                <span class="req-id">#REQ-112</span>
+                <span class="req-badge urgent">Urgent</span>
+              </div>
+              <h4>O− Blood Required</h4>
+              <p><i class="fas fa-hospital"></i> Apollo Hospital, Mumbai</p>
+              <p><i class="fas fa-tint"></i> Units needed: <strong>4</strong></p>
+              <p><i class="fas fa-clock"></i> Requested: 5 min ago</p>
+              <div class="req-actions">
+                <button class="btn-approve">Approve</button>
+                <button class="btn-decline">Decline</button>
+              </div>
+            </div>
+            <div class="request-card normal">
+              <div class="req-header">
+                <span class="req-id">#REQ-111</span>
+                <span class="req-badge normal">Normal</span>
+              </div>
+              <h4>A+ Blood Required</h4>
+              <p><i class="fas fa-hospital"></i> District Hospital, Pune</p>
+              <p><i class="fas fa-tint"></i> Units needed: <strong>2</strong></p>
+              <p><i class="fas fa-clock"></i> Requested: 1 hr ago</p>
+              <div class="req-actions">
+                <button class="btn-approve">Approve</button>
+                <button class="btn-decline">Decline</button>
+              </div>
+            </div>
+            <div class="request-card urgent">
+              <div class="req-header">
+                <span class="req-id">#REQ-110</span>
+                <span class="req-badge urgent">Urgent</span>
+              </div>
+              <h4>B+ Blood Required</h4>
+              <p><i class="fas fa-hospital"></i> Lilavati Hospital, Navi Mumbai</p>
+              <p><i class="fas fa-tint"></i> Units needed: <strong>6</strong></p>
+              <p><i class="fas fa-clock"></i> Requested: 2 hr ago</p>
+              <div class="req-actions">
+                <button class="btn-approve">Approve</button>
+                <button class="btn-decline">Decline</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
